@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Chúc Mừng Sinh Nhật</title>
+    <style>
+        :root {
+            --neon-blue: #00ffff;
+            --text-glow-1: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue);
+            --text-glow-2: 0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue), 0 0 60px var(--neon-blue);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            height: 100vh;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            position: relative;
+        }
+
+        /* Start Button */
+        #startButton {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2000;
+            background: var(--neon-blue);
+            color: #000;
+            padding: 20px 40px;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 0 20px var(--neon-blue);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        #startButton:hover {
+            transform: translate(-50%, -50%) scale(1.05);
+        }
+
+        /* Digital Rain */
+        .digital-rain {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0, 255, 255, 0.1), rgba(0, 0, 0, 0.5));
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .rain-drop {
+            position: absolute;
+            font-family: 'Courier New', monospace;
+            color: rgba(0, 255, 255, 0.8);
+            font-size: 12px;
+            animation: rainFall 2s linear infinite;
+        }
+
+        @keyframes rainFall {
+            0% {
+                transform: translateY(-100%);
+            }
+            100% {
+                transform: translateY(100vh);
+            }
+        }
+
+        /* Music Controls */
+        .music-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .volume-control input[type="range"] {
+            width: 100%;
+            accent-color: var(--neon-blue);
+        }
+
+        /* Main Content */
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+            z-index: 10;
+        }
+
+        .content {
+            text-align: center;
+            color: white;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .countdown, .text-display, .star-display, .image-display { /* Added .image-display */
+            font-weight: bold; /* This might not apply to images but good for consistency */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            pointer-events: none; /* Prevent interaction with hidden elements */
+        }
+
+        .countdown.active, .text-display.active, .star-display.active, .image-display.active { /* Added .image-display */
+            opacity: 1;
+        }
+
+        .text-display, .star-display {
+            color: var(--neon-blue);
+            text-shadow: var(--text-glow-1);
+            animation: textGlow 2s infinite;
+        }
+
+        /* Specific styles for image display */
+        .image-display {
+            width: 90%; /* Adjust as needed */
+            height: 90%; /* Adjust as needed */
+            display: flex; /* Use flexbox to center image inside */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-display img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; /* Ensures the image fits without cropping */
+            border-radius: 10px; /* Optional: adds rounded corners to images */
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.6), 0 0 40px rgba(0, 255, 255, 0.4); /* Neon glow for images */
+        }
+
+
+        /* Star Canvas */
+        #starCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="startButton">Bắt đầu</div>
+
+    <canvas id="starCanvas"></canvas>
+
+    <div class="digital-rain"></div>
+
+    <div class="music-controls">
+        <div>Đang phát: Birthday Song</div>
+        <div class="volume-control">
+            <label for="volumeSlider">Âm lượng:</label>
+            <input type="range" id="volumeSlider" min="0" max="100" value="50">
+        </div>
+        <audio id="backgroundMusic" src="Happy Birthday to You.mp3" loop></audio>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div id="countdown" class="countdown"></div>
+            <div id="textDisplay" class="text-display"></div>
+            <div id="starDisplay" class="star-display">⭐</div>
+            <div id="imageDisplay" class="image-display"></div> </div>
+    </div>
+
+    <script>
+        // IIFE for star canvas script to encapsulate its scope
+        (function() {
+            const canvas = document.getElementById('starCanvas');
+            const ctx = canvas.getContext('2d');
+            let stars = [];
+            const STAR_COUNT = 300; // Increased star count for better shape
+            const STAR_RADIUS_MIN = 0.5;
+            const STAR_RADIUS_MAX = 1.5;
+            const STAR_ALPHA_MIN = 0.1;
+            const STAR_ALPHA_MAX = 1;
+            const STAR_SPEED_MAX = 0.1; // Slower movement for stability
+            let centerX;
+            let centerY;
+            let currentStarAlpha = 0; // For fading in the star shape
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                centerX = canvas.width / 2;
+                centerY = canvas.height / 2;
+                // Only recreate star shape if stars array exists (i.e., animation has started)
+                if (stars.length > 0) {
+                    createStarShape();
+                }
+            }
+
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas(); // Initial resize
+
+            // Function to calculate points of a 5-pointed star
+            function getStarPoints(xCenter, yCenter, outerRadius, innerRadius, numPoints = 5) {
+                const points = [];
+                const angleStep = Math.PI / numPoints; // Angle between each point (outer to inner)
+
+                for (let i = 0; i < 2 * numPoints; i++) {
+                    const radius = (i % 2 === 0) ? outerRadius : innerRadius;
+                    const angle = Math.PI / 2 + i * angleStep; // Start from top point (adjust for orientation)
+                    const x = xCenter + radius * Math.cos(angle);
+                    const y = yCenter - radius * Math.sin(angle); // Subtract for canvas Y-axis
+                    points.push({ x, y });
+                }
+                return points;
+            }
+
+            function createStarShape() {
+                stars = []; // Clear existing stars
+                const minDim = Math.min(centerX, centerY);
+                const outerRadius = minDim * 0.4; // Adjust size of the main star
+                const innerRadius = outerRadius * 0.4; // Proportion for inner points
+
+                const starPoints = getStarPoints(centerX, centerY, outerRadius, innerRadius);
+
+                // Distribute smaller stars along the outline of the main star
+                const pointsPerSegment = STAR_COUNT / (starPoints.length); // Distribute evenly
+                for (let i = 0; i < starPoints.length; i++) {
+                    const p1 = starPoints[i];
+                    const p2 = starPoints[(i + 1) % starPoints.length]; // Connect last to first
+
+                    for (let j = 0; j < pointsPerSegment; j++) {
+                        const t = j / pointsPerSegment; // Interpolation factor
+                        const x = p1.x + t * (p2.x - p1.x) + (Math.random() - 0.5) * 8; // Add slight randomness
+                        const y = p1.y + t * (p2.y - p1.y) + (Math.random() - 0.5) * 8;
+
+                        stars.push({
+                            x: x,
+                            y: y,
+                            radius: Math.random() * (STAR_RADIUS_MAX - STAR_RADIUS_MIN) + STAR_RADIUS_MIN,
+                            alpha: Math.random() * (STAR_ALPHA_MAX - STAR_ALPHA_MIN) + STAR_ALPHA_MIN,
+                            dx: (Math.random() - 0.5) * STAR_SPEED_MAX,
+                            dy: (Math.random() - 0.5) * STAR_SPEED_MAX
+                        });
+                    }
+                }
+
+                // Add some stars for density within the shape
+                const innerStarCount = STAR_COUNT * 0.3; // A portion of stars inside
+                for(let i = 0; i < innerStarCount; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const radius = Math.random() * innerRadius * 0.8; // Smaller radius for inner stars
+                    stars.push({
+                        x: centerX + radius * Math.cos(angle),
+                        y: centerY + radius * Math.sin(angle),
+                        radius: Math.random() * (STAR_RADIUS_MAX - STAR_RADIUS_MIN) + STAR_RADIUS_MIN,
+                        alpha: Math.random() * (STAR_ALPHA_MAX - STAR_ALPHA_MIN) + STAR_ALPHA_MIN,
+                        dx: (Math.random() - 0.5) * STAR_SPEED_MAX,
+                        dy: (Math.random() - 0.5) * STAR_SPEED_MAX
+                    });
+                }
+            }
+
+            function drawStars() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Fade in the star shape initially
+                if (currentStarAlpha < 1) {
+                    currentStarAlpha += 0.01; // Adjust speed of fade-in
+                    if (currentStarAlpha > 1) currentStarAlpha = 1;
+                }
+
+                for (let star of stars) {
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                    // Use currentStarAlpha for global fade-in
+                    ctx.fillStyle = `rgba(0, 255, 255, ${star.alpha * currentStarAlpha})`;
+                    ctx.fill();
+
+                    star.x += star.dx;
+                    star.y += star.dy;
+
+                    // Twinkling effect
+                    star.alpha += (Math.random() - 0.5) * 0.05;
+                    if (star.alpha < STAR_ALPHA_MIN) star.alpha = STAR_ALPHA_MIN;
+                    if (star.alpha > STAR_ALPHA_MAX) star.alpha = STAR_ALPHA_MAX;
+
+                    // Simple boundary check: if star goes too far, reset it near the center or an edge
+                    const boundary = Math.min(centerX, centerY) * 0.8; // Keep stars within a central area
+                    const resetMargin = 50; // Margin from edges to reset
+
+                    if (star.x < centerX - boundary - resetMargin || star.x > centerX + boundary + resetMargin ||
+                        star.y < centerY - boundary - resetMargin || star.y > centerY + boundary + resetMargin) {
+                        // Reset star's position near the center or a random point within the star's main area
+                        star.x = centerX + (Math.random() - 0.5) * (outerRadius * 1.5);
+                        star.y = centerY + (Math.random() - 0.5) * (outerRadius * 1.5);
+                        star.dx = (Math.random() - 0.5) * STAR_SPEED_MAX;
+                        star.dy = (Math.random() - 0.5) * STAR_SPEED_MAX;
+                    }
+                }
+                requestAnimationFrame(drawStars);
+            }
+
+            // Public function to start stars
+            window.startStarAnimation = () => {
+                createStarShape(); // Create stars to form the shape
+                drawStars(); // Start drawing them
+            };
+        })();
+
+        // Main script
+        document.addEventListener('DOMContentLoaded', () => {
+            const startButton = document.getElementById('startButton');
+            const backgroundMusic = document.getElementById('backgroundMusic');
+            const volumeSlider = document.getElementById('volumeSlider');
+            const digitalRainContainer = document.querySelector('.digital-rain');
+
+            const countdownElement = document.getElementById('countdown');
+            const textDisplayElement = document.getElementById('textDisplay');
+            const starDisplayElement = document.getElementById('starDisplay');
+            const imageDisplayElement = document.getElementById('imageDisplay'); // Get the new image display element
+
+            const rainDrops = [];
+            const NUMBER_OF_RAIN_DROPS = 50; // Optimized number of rain drops
+
+            // Initialize rain drops
+            for (let i = 0; i < NUMBER_OF_RAIN_DROPS; i++) {
+                const drop = document.createElement('div');
+                drop.className = 'rain-drop';
+                drop.style.left = Math.random() * 100 + 'vw';
+                drop.style.animationDelay = `-${Math.random() * 2}s`; // Start at random points in animation cycle
+                drop.textContent = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+                digitalRainContainer.appendChild(drop);
+                rainDrops.push(drop);
+            }
+
+            // Music volume control
+            volumeSlider.addEventListener('input', (e) => {
+                backgroundMusic.volume = e.target.value / 100;
+            });
+            backgroundMusic.volume = 0.5; // Default volume
+
+            // Sequence data - ADD YOUR IMAGE PATHS HERE
+            const sequence = [
+                // The first item will now implicitly be the star canvas appearing
+                { text: "3", fontSize: "8rem", duration: 1000, type: 'countdown' },
+                { text: "2", fontSize: "8rem", duration: 1000, type: 'countdown' },
+                { text: "1", fontSize: "8rem", duration: 1000, type: 'countdown' },
+                { text: "🎉 Happy Birthday 🎉", fontSize: "4rem", duration: 4000, type: 'text' },
+                { text: "Huỳnh Thị Thùy Lâm (Mie)", fontSize: "5rem", duration: 4000, type: 'text' },
+                { text: "📅 16/07/2025", fontSize: "3rem", duration: 4000, type: 'text' },
+                { text: "🎂 17 tuổi", fontSize: "3rem", duration: 4000, type: 'text' },
+                { text: "Chúc mừng sinh nhật!", fontSize: "3rem", duration: 4000, type: 'text' },
+                { text: "Hạnh phúc và thành công!", fontSize: "3rem", duration: 4000, type: 'text' },
+ //               { text: "⭐", fontSize: "8rem", duration: 3000, type: 'star-display' }, // Final single star
+                // --- ADD YOUR IMAGES BELOW HERE ---
+                { src: "1.jpg", duration: 4000, type: 'image' }, // Replace with your image path
+                { src: "2.jpg", duration: 4000, type: 'image' }, // Replace with your image path
+                { src: "3.jpg", duration: 4000, type: 'image' },  // Replace with your image path
+                { src: "4.jpg", duration: 4000, type: 'image' },  // Replace with your image path
+                { src: "5.jpg", duration: 4000, type: 'image' },  // Replace with your image path
+                { src: "6.jpg", duration: 4000, type: 'image' },  // Replace with your image path
+                { src: "7.jpg", duration: 4000, type: 'image' },  // Replace with your image path
+                { src: "8.jpg", duration: 4000, type: 'image' },  // Replace with your image path
+                { src: "9.jpg", duration: 4000, type: 'image' },  // Replace with your image path
+                { src: "10.jpg", duration: 4000, type: 'image' },  // Replace with your image path
+                { src: "11.jpg", duration: 4000, type: 'image' },  // Replace with your image path
+                // Add more image entries as needed
+                // { src: "path/to/your/image4.jpg", duration: 4000, type: 'image' },
+            ];
+
+            let sequenceIndex = 0;
+            let initialStarDisplayDelay = 3000; // Time to let the star shape form before countdown
+
+            function displayNextSequenceItem() {
+                if (sequenceIndex >= sequence.length) return;
+
+                const currentItem = sequence[sequenceIndex];
+
+                // Hide all elements first
+                countdownElement.classList.remove('active');
+                textDisplayElement.classList.remove('active');
+            
+                starDisplayElement.classList.remove('active');
+                imageDisplayElement.classList.remove('active'); // Hide image display
+
+                countdownElement.style.display = 'none';
+                textDisplayElement.style.display = 'none';
+                starDisplayElement.style.display = 'none';
+                imageDisplayElement.style.display = 'none'; // Hide image display
+
+
+                // Display current item based on type
+                switch (currentItem.type) {
+                    case 'countdown':
+                        countdownElement.textContent = currentItem.text;
+                        countdownElement.style.fontSize = currentItem.fontSize;
+                        countdownElement.style.display = 'block';
+                        countdownElement.classList.add('active');
+                        break;
+                    case 'text':
+                        textDisplayElement.textContent = currentItem.text;
+                        textDisplayElement.style.fontSize = currentItem.fontSize;
+                        textDisplayElement.style.display = 'block';
+                        textDisplayElement.classList.add('active');
+                        break;
+                    case 'star-display': // This is for the final single star emoji
+                        starDisplayElement.style.display = 'block';
+                        starDisplayElement.classList.add('active');
+                        break;
+                    case 'image': // Handle image display
+                        imageDisplayElement.innerHTML = ''; // Clear previous image
+                        const img = document.createElement('img');
+                        img.src = currentItem.src;
+                        // Optional: Add alt text for accessibility
+                        img.alt = "Birthday Image"; 
+                        imageDisplayElement.appendChild(img);
+                        imageDisplayElement.style.display = 'flex'; // Use flex to center the image
+                        imageDisplayElement.classList.add('active');
+                        break;
+                }
+
+                sequenceIndex++;
+                setTimeout(displayNextSequenceItem, currentItem.duration);
+            }
+
+            startButton.addEventListener('click', () => {
+                startButton.style.display = 'none';
+                window.startStarAnimation(); // Call the global function for stars
+
+                backgroundMusic.play().catch(error => {
+                    console.error("Autoplay prevented:", error);
+                    alert("Trình duyệt không cho phép phát nhạc tự động. Hãy bật âm thanh thủ công.");
+                });
+
+                // Start the sequence after a delay to allow the star shape to form
+                setTimeout(displayNextSequenceItem, initialStarDisplayDelay);
+            });
+        });
+    </script>
+</body>
+</html>
