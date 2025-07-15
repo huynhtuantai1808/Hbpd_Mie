@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+    
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Chúc Mừng Sinh Nhật</title>
@@ -164,6 +165,7 @@
         }
     </style>
 </head>
+
 <body>
     <div id="startButton">Bắt đầu</div>
 
@@ -177,7 +179,7 @@
             <label for="volumeSlider">Âm lượng:</label>
             <input type="range" id="volumeSlider" min="0" max="100" value="50">
         </div>
-        <audio id="backgroundMusic" src="Happy Birthday to You.mp3" loop></audio>
+        <audio id="backgroundMusic" src="ĐÂY LÀ BÀI HÁT SINH NHẬT.mp3" loop></audio>
     </div>
 
     <div class="container">
@@ -187,7 +189,7 @@
             <div id="starDisplay" class="star-display">⭐</div>
             <div id="imageDisplay" class="image-display"></div> </div>
     </div>
-
+    <script src="effects.js"></script>
     <script>
         // IIFE for star canvas script to encapsulate its scope
         (function() {
@@ -340,7 +342,11 @@
 
             const rainDrops = [];
             const NUMBER_OF_RAIN_DROPS = 50; // Optimized number of rain drops
-
+            const fontStyle = 'bold 96px "Segoe UI", sans-serif';
+            const textColor = '#aafaff';
+            let currentLine = 0, textPhase='fadein', textAlpha=0, frameCnt=0;
+            const HOLD = 100, FADE = 40;
+            const textParticles = [];
             // Initialize rain drops
             for (let i = 0; i < NUMBER_OF_RAIN_DROPS; i++) {
                 const drop = document.createElement('div');
@@ -368,8 +374,12 @@
                 { text: "Huỳnh Thị Thùy Lâm (Mie)", fontSize: "5rem", duration: 4000, type: 'text' },
                 { text: "📅 16/07/2025", fontSize: "3rem", duration: 4000, type: 'text' },
                 { text: "🎂 17 tuổi", fontSize: "3rem", duration: 4000, type: 'text' },
-                { text: "Chúc mừng sinh nhật!", fontSize: "3rem", duration: 4000, type: 'text' },
-                { text: "Hạnh phúc và thành công!", fontSize: "3rem", duration: 4000, type: 'text' },
+                { text: "Chúc mừng sinh nhật Mee nha!", fontSize: "3rem", duration: 4000, type: 'text' },
+                { text: "Tuổi mới phải thật Hạnh phúc và thành công hơn nè!", fontSize: "3rem", duration: 4000, type: 'text' },
+                { text: "Gát lại những nỗi buồn của tuổi 16 và bắt đầu mới của tuổi 17,", fontSize: "3rem", duration: 4000, type: 'text' },
+                { text: "Và chuẩn bị hành trang để bước vào giai đoạn lớp 12 đầy cam go phía trước nhé.", fontSize: "3rem", duration: 4000, type: 'text' },
+
+
  //               { text: "⭐", fontSize: "8rem", duration: 3000, type: 'star-display' }, // Final single star
                 // --- ADD YOUR IMAGES BELOW HERE ---
                 { src: "1.jpg", duration: 4000, type: 'image' }, // Replace with your image path
@@ -455,6 +465,9 @@
                 setTimeout(displayNextSequenceItem, initialStarDisplayDelay);
             });
         });
+        
     </script>
+    
 </body>
+<script src="effects.js"></script>
 </html>
