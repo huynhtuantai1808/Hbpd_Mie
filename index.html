@@ -354,11 +354,15 @@
                 { text: 'Gát lại những nỗi buồn của tuổi 17 và bắt đầu mới của tuổi 18.', fontSize: '3rem', duration: 4000, type: 'text' },
                 { text: 'Và chuẩn bị hành trang thật tốt để bước vào quãng thời gian cao học đầy cam go nhưng cũng nhiều điều đáng mong chờ nhé.', fontSize: '3rem', duration: 4000, type: 'text' }
             ];
-            const imageSequence = (window.imageManifest || []).map((src) => ({
-                src,
-                duration: 4000,
-                type: 'image'
-            }));
+            const rawImageManifest = Array.isArray(window.imageManifest) ? window.imageManifest : [];
+            const imageSequence = rawImageManifest
+                .filter((src) => typeof src === 'string' && src.trim())
+                .map((src) => String(src).trim().replace(/\\/g, '/'))
+                .map((src) => ({
+                    src: src.startsWith('./') || src.startsWith('/') ? src : `./${src.replace(/^\/+/, '')}`,
+                    duration: 4000,
+                    type: 'image'
+                }));
 
             let introIndex = 0;
             let imageIndex = 0;
