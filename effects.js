@@ -1,16 +1,31 @@
 // effects.js
 
 const canvas = document.getElementById('starCanvas');
+if (!canvas) {
+  throw new Error('Canvas element #starCanvas not found');
+}
+
 const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+let width = window.innerWidth;
+let height = window.innerHeight;
+canvas.width = width;
+canvas.height = height;
+
+function resizeCanvas() {
+  width = window.innerWidth;
+  height = window.innerHeight;
+  canvas.width = width;
+  canvas.height = height;
+}
+
+window.addEventListener('resize', resizeCanvas);
 
 // ⭐ Twinkling stars
 let stars = [];
 for (let i = 0; i < 100; i++) {
   stars.push({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
+    x: Math.random() * width,
+    y: Math.random() * height,
     r: Math.random() * 1.5 + 0.5,
     alpha: Math.random(),
     delta: Math.random() * 0.02 + 0.005,
@@ -20,7 +35,7 @@ for (let i = 0; i < 100; i++) {
 // 🌧️ Streaks
 class Streak {
   constructor() {
-    this.x = Math.random() * canvas.width;
+    this.x = Math.random() * width;
     this.y = -60;
     this.length = Math.random() * 80 + 120;
     this.speed = Math.random() * 3 + 4;
@@ -43,7 +58,7 @@ class Streak {
     ctx.globalAlpha = 1;
   }
   alive() {
-    return this.alpha > 0 && this.y < canvas.height + this.length;
+    return this.alpha > 0 && this.y < height + this.length;
   }
 }
 
@@ -91,8 +106,8 @@ const textColor = '#aaffff';
 let textQueue = [
   "🎉 Happy Birthday 🎉",
   "Huỳnh Thị Thùy Lâm (Mie)",
-  "📅 16/07/2025",
-  "🎂 17 tuổi",
+  "📅 16/07/2026",
+  "🎂 18 tuổi",
   "Chúc mừng sinh nhật!",
   "Hạnh phúc và thành công!"
 ];
@@ -150,8 +165,9 @@ function drawHeart(cx, cy, size, alpha) {
 }
 
 function animate() {
+  ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = 'black';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, width, height);
 
   // 💡 Neon flicker overlay
   if (Math.random() < 0.05) {
@@ -196,12 +212,18 @@ function animate() {
     heartAlpha += 0.01;
     heartPulse += 0.05;
     const scale = 0.12 + Math.sin(heartPulse) * 0.005;
-    drawHeart(canvas.width / 2, canvas.height * 0.8, scale, heartAlpha);
+    drawHeart(width / 2, height * 0.8, scale, heartAlpha);
   }
 
   requestAnimationFrame(animate);
 }
 
-window.addEventListener('load', () => {
+let animationStarted = false;
+function startAnimation() {
+  if (animationStarted) return;
+  animationStarted = true;
   animate();
-});
+}
+
+window.addEventListener('load', startAnimation);
+window.startStarAnimation = startAnimation;
