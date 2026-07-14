@@ -276,7 +276,6 @@
     </div>
 
     <script src="effects.js"></script>
-    <script src="image-manifest.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const startButton = document.getElementById('startButton');
@@ -354,7 +353,7 @@
                 { text: 'Gát lại những nỗi buồn của tuổi 17 và bắt đầu mới của tuổi 18.', fontSize: '3rem', duration: 4000, type: 'text' },
                 { text: 'Và chuẩn bị hành trang thật tốt để bước vào quãng thời gian cao học đầy cam go nhưng cũng nhiều điều đáng mong chờ nhé.', fontSize: '3rem', duration: 4000, type: 'text' }
             ];
-            const fallbackImageManifest = [
+            const imageSequence = [
                 'src/1.jpg',
                 'src/2.jpg',
                 'src/3.jpg',
@@ -363,10 +362,6 @@
                 'src/6.jpg',
                 'src/7.jpg',
                 'src/8.jpg',
-                'src/9.jpg',
-                'src/10.jpg',
-                'src/11.jpg',
-                'src/12.jpg',
                 'src/13.jpg',
                 'src/14.jpg',
                 'src/16.jpg',
@@ -374,26 +369,17 @@
                 'src/19.jpg',
                 'src/20.jpg',
                 'src/21.jpg',
-                'src/22.jpg',
-                'src/23.jpg',
-                'src/24.jpg',
-                'src/25.jpg',
                 'src/26.jpg',
                 'src/27.jpg',
                 'src/28.jpg',
                 'src/29.jpg',
                 'src/30.jpg',
                 'src/31.jpg'
-            ];
-            const rawImageManifest = Array.isArray(window.imageManifest) ? window.imageManifest : fallbackImageManifest;
-            const imageSequence = rawImageManifest
-                .filter((src) => typeof src === 'string' && src.trim())
-                .map((src) => String(src).trim().replace(/\\/g, '/'))
-                .map((src) => ({
-                    src: src.startsWith('./') || src.startsWith('/') ? src : `./${src.replace(/^\/+/, '')}`,
-                    duration: 4000,
-                    type: 'image'
-                }));
+            ].map((src) => ({
+                src: src.startsWith('./') || src.startsWith('/') ? src : `./${src.replace(/^\/+/, '')}`,
+                duration: 4000,
+                type: 'image'
+            }));
 
             let introIndex = 0;
             let imageIndex = 0;
@@ -491,8 +477,7 @@
                 try {
                     await backgroundMusic.play();
                 } catch (error) {
-                    console.error('Autoplay prevented:', error);
-                    alert('Trình duyệt không cho phép phát nhạc tự động. Hãy bật âm thanh thủ công.');
+                    console.warn('Audio autoplay was blocked or unavailable:', error);
                 }
 
                 const imageSources = imageSequence.map((item) => item.src);
