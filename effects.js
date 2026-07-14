@@ -20,9 +20,14 @@ function resizeCanvas() {
 
 window.addEventListener('resize', resizeCanvas);
 
+const isMobile = window.innerWidth <= 768 || navigator.maxTouchPoints > 0;
+const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const starCount = isMobile ? 45 : 100;
+const streakRate = isMobile ? 2 : 6;
+
 // ⭐ Twinkling stars
 let stars = [];
-for (let i = 0; i < 100; i++) {
+for (let i = 0; i < starCount; i++) {
   stars.push({
     x: Math.random() * width,
     y: Math.random() * height,
@@ -68,13 +73,13 @@ const streaks = [];
 class Particle {
   constructor(x, y, color) {
     const a = Math.random() * Math.PI * 2;
-    const s = Math.random() * 4 + 2;
+    const s = (isMobile ? 1.8 : 4) + Math.random() * (isMobile ? 1.2 : 2);
     this.x = x;
     this.y = y;
     this.vx = Math.cos(a) * s;
     this.vy = Math.sin(a) * s;
     this.alpha = 1;
-    this.size = Math.random() * 2 + 2;
+    this.size = Math.random() * (isMobile ? 1.4 : 2) + (isMobile ? 1.2 : 2);
     this.color = color;
   }
   update() {
@@ -116,6 +121,8 @@ let currentTextIndex = 0;
 let explodeCooldown = 0;
 
 function explodeText(txt) {
+  if (isMobile || isReducedMotion) return;
+
   const off = document.createElement('canvas');
   const tctx = off.getContext('2d');
   tctx.font = fontStyle;
@@ -188,7 +195,7 @@ function animate() {
   });
   ctx.globalAlpha = 1;
 
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < streakRate; i++) {
     if (Math.random() < 0.8) streaks.push(new Streak());
   }
   streaks.forEach(s => { s.update(); s.draw(); });

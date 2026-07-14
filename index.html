@@ -372,12 +372,18 @@
                 });
             }
 
+            function resolveAssetPath(src) {
+                return new URL(src, window.location.href).href;
+            }
+
             function preloadImages(imageList) {
-                return Promise.all(imageList.map((src) => new Promise((resolve) => {
+                const limitedList = (imageList || []).slice(0, 6);
+                return Promise.all(limitedList.map((src) => new Promise((resolve) => {
                     const img = new Image();
-                    img.onload = resolve;
-                    img.onerror = resolve;
-                    img.src = src;
+                    img.decoding = 'async';
+                    img.onload = () => resolve(src);
+                    img.onerror = () => resolve(src);
+                    img.src = resolveAssetPath(src);
                 })));
             }
 
@@ -417,9 +423,11 @@
                     case 'image':
                         imageDisplayElement.innerHTML = '';
                         const img = document.createElement('img');
-                        img.src = currentItem.src;
+                        img.src = resolveAssetPath(currentItem.src);
                         img.alt = 'Birthday Image';
+                        img.decoding = 'async';
                         img.loading = 'eager';
+                        img.style.opacity = '1';
                         imageDisplayElement.appendChild(img);
                         activeLayer = imageDisplayElement;
                         break;
