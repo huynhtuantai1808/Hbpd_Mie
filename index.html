@@ -354,7 +354,38 @@
                 { text: 'Gát lại những nỗi buồn của tuổi 17 và bắt đầu mới của tuổi 18.', fontSize: '3rem', duration: 4000, type: 'text' },
                 { text: 'Và chuẩn bị hành trang thật tốt để bước vào quãng thời gian cao học đầy cam go nhưng cũng nhiều điều đáng mong chờ nhé.', fontSize: '3rem', duration: 4000, type: 'text' }
             ];
-            const rawImageManifest = Array.isArray(window.imageManifest) ? window.imageManifest : [];
+            const fallbackImageManifest = [
+                'Hbpd_Mie/1.jpg',
+                'Hbpd_Mie/2.jpg',
+                'Hbpd_Mie/3.jpg',
+                'Hbpd_Mie/4.jpg',
+                'Hbpd_Mie/5.jpg',
+                'Hbpd_Mie/6.jpg',
+                'Hbpd_Mie/7.jpg',
+                'Hbpd_Mie/8.jpg',
+                'Hbpd_Mie/9.jpg',
+                'Hbpd_Mie/10.jpg',
+                'Hbpd_Mie/11.jpg',
+                'Hbpd_Mie/12.jpg',
+                'Hbpd_Mie/13.jpg',
+                'Hbpd_Mie/14.jpg',
+                'Hbpd_Mie/16.jpg',
+                'Hbpd_Mie/18.jpg',
+                'Hbpd_Mie/19.jpg',
+                'Hbpd_Mie/20.jpg',
+                'Hbpd_Mie/21.jpg',
+                'Hbpd_Mie/22.jpg',
+                'Hbpd_Mie/23.jpg',
+                'Hbpd_Mie/24.jpg',
+                'Hbpd_Mie/25.jpg',
+                'Hbpd_Mie/26.jpg',
+                'Hbpd_Mie/27.jpg',
+                'Hbpd_Mie/28.jpg',
+                'Hbpd_Mie/29.jpg',
+                'Hbpd_Mie/30.jpg',
+                'Hbpd_Mie/31.jpg'
+            ];
+            const rawImageManifest = Array.isArray(window.imageManifest) ? window.imageManifest : fallbackImageManifest;
             const imageSequence = rawImageManifest
                 .filter((src) => typeof src === 'string' && src.trim())
                 .map((src) => String(src).trim().replace(/\\/g, '/'))
@@ -377,7 +408,11 @@
             }
 
             function resolveAssetPath(src) {
-                return new URL(src, window.location.href).href;
+                if (!src) return src;
+                const normalized = String(src).trim().replace(/\\/g, '/');
+                if (/^https?:\/\//i.test(normalized)) return normalized;
+                const relative = normalized.startsWith('./') || normalized.startsWith('/') ? normalized : `./${normalized.replace(/^\/+/, '')}`;
+                return new URL(relative, window.location.href).href;
             }
 
             function preloadImages(imageList) {
