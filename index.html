@@ -7,9 +7,11 @@
     <title>Chúc Mừng Sinh Nhật</title>
     <style>
         :root {
-            --neon-blue: #00ffff;
-            --text-glow-1: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue);
-            --text-glow-2: 0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue), 0 0 60px var(--neon-blue);
+            --birthday-pink: #ff7dd9;
+            --birthday-cyan: #7ef0ff;
+            --birthday-gold: #ffe37a;
+            --text-glow-1: 0 0 8px rgba(255, 125, 217, 0.85), 0 0 18px rgba(126, 240, 255, 0.55);
+            --text-glow-2: 0 0 16px rgba(255, 125, 217, 0.95), 0 0 34px rgba(126, 240, 255, 0.75);
         }
 
         * {
@@ -25,7 +27,9 @@
         }
 
         body {
-            background: #000;
+            background: radial-gradient(circle at top left, rgba(255, 112, 225, 0.20), transparent 25%),
+                        radial-gradient(circle at bottom right, rgba(64, 240, 255, 0.14), transparent 22%),
+                        linear-gradient(135deg, #14002a 0%, #5e1f8d 40%, #ff5abc 100%);
             min-height: 100vh;
             min-height: 100dvh;
             font-family: Arial, sans-serif;
@@ -40,28 +44,31 @@
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 2000;
-            background: var(--neon-blue);
-            color: #000;
+            background: linear-gradient(135deg, var(--birthday-cyan), var(--birthday-pink));
+            color: #111;
             padding: clamp(14px, 2.2vw, 24px) clamp(20px, 3vw, 36px);
             font-size: clamp(1rem, 2.3vw, 1.5rem);
             border: none;
             border-radius: 999px;
             cursor: pointer;
-            box-shadow: 0 0 20px var(--neon-blue);
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            box-shadow: 0 0 24px rgba(126, 240, 255, 0.35), 0 0 40px rgba(255, 125, 217, 0.18);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, filter 0.2s ease;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
 
         #startButton:hover {
-            transform: translate(-50%, -50%) scale(1.05);
+            transform: translate(-50%, -50%) scale(1.06);
+            filter: brightness(1.05);
         }
 
         /* Digital Rain */
         .digital-rain {
             position: absolute;
             inset: 0;
-            background: linear-gradient(to bottom, rgba(0, 255, 255, 0.1), rgba(0, 0, 0, 0.5));
+            background: radial-gradient(circle at 30% 20%, rgba(255, 165, 234, 0.14), transparent 24%),
+                        radial-gradient(circle at 80% 75%, rgba(120, 245, 255, 0.10), transparent 18%),
+                        linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0));
             overflow: hidden;
             z-index: 1;
         }
@@ -69,9 +76,10 @@
         .rain-drop {
             position: absolute;
             font-family: 'Courier New', monospace;
-            color: rgba(0, 255, 255, 0.8);
-            font-size: 12px;
-            animation: rainFall 2s linear infinite;
+            color: rgba(255, 255, 255, 0.92);
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.28);
+            font-size: 14px;
+            animation: rainFall 2.6s linear infinite;
         }
 
         @keyframes rainFall {
@@ -89,11 +97,12 @@
             top: 12px;
             right: 12px;
             z-index: 1000;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(12, 4, 36, 0.72);
+            backdrop-filter: blur(12px);
             padding: 12px;
-            border-radius: 10px;
-            border: 1px solid var(--neon-blue);
-            color: var(--neon-blue);
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: var(--birthday-cyan);
             font-size: clamp(10px, 1.6vw, 12px);
             display: flex;
             flex-direction: column;
@@ -175,9 +184,12 @@
         }
 
         .text-display, .star-display {
-            color: var(--neon-blue);
-            text-shadow: var(--text-glow-1);
-            animation: textGlow 2s infinite;
+            color: transparent;
+            background: linear-gradient(135deg, var(--birthday-pink), var(--birthday-cyan));
+            -webkit-background-clip: text;
+            background-clip: text;
+            text-shadow: 0 0 18px rgba(255, 255, 255, 0.3);
+            animation: textGlow 2.2s infinite ease-in-out;
         }
 
         .image-display {
@@ -195,9 +207,10 @@
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
-            border-radius: 16px;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.6), 0 0 40px rgba(0, 255, 255, 0.4);
-            transition: transform 0.8s ease, opacity 0.8s ease;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: 0 0 28px rgba(255, 115, 218, 0.18), 0 0 55px rgba(126, 240, 255, 0.22);
+            transition: transform 0.8s ease, opacity 0.8s ease, box-shadow 0.8s ease;
             transform: scale(0.98);
         }
 
@@ -288,14 +301,20 @@
             const starDisplayElement = document.getElementById('starDisplay');
             const imageDisplayElement = document.getElementById('imageDisplay');
 
+            const confettiChars = ['🎈', '✨', '🎁', '💖', '🌟', '🥳', '🎂'];
             const rainDrops = [];
-            const NUMBER_OF_RAIN_DROPS = 50;
+            const NUMBER_OF_RAIN_DROPS = 48;
             for (let i = 0; i < NUMBER_OF_RAIN_DROPS; i++) {
                 const drop = document.createElement('div');
                 drop.className = 'rain-drop';
                 drop.style.left = Math.random() * 100 + 'vw';
+                drop.style.top = `${-Math.random() * 25}vh`;
+                drop.style.opacity = 0.9;
+                drop.style.fontSize = `${12 + Math.random() * 10}px`;
+                drop.style.animationDuration = `${2.4 + Math.random() * 1.2}s`;
                 drop.style.animationDelay = `-${Math.random() * 2}s`;
-                drop.textContent = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+                drop.style.color = `hsl(${320 + Math.random() * 200}, 100%, 84%)`;
+                drop.textContent = confettiChars[Math.floor(Math.random() * confettiChars.length)];
                 digitalRainContainer.appendChild(drop);
                 rainDrops.push(drop);
             }
@@ -344,15 +363,20 @@
                 { text: '3', fontSize: '8rem', duration: 1000, type: 'countdown' },
                 { text: '2', fontSize: '8rem', duration: 1000, type: 'countdown' },
                 { text: '1', fontSize: '8rem', duration: 1000, type: 'countdown' },
-                { text: '🎉 Happy Birthday 🎉', fontSize: '4rem', duration: 4000, type: 'text' },
-                { text: 'Huỳnh Thị Thùy Lâm (7 bLack)', fontSize: '5rem', duration: 4000, type: 'text' },
-                { text: '📅 16/07/2026', fontSize: '3rem', duration: 4000, type: 'text' },
-                { text: '🎂 18 tuổi', fontSize: '3rem', duration: 4000, type: 'text' },
-                { text: 'Chúc mừng sinh nhật Mee nha!', fontSize: '3rem', duration: 4000, type: 'text' },
-                { text: 'Tuổi mới phải thật Hạnh phúc và thành công hơn nè!', fontSize: '3rem', duration: 4000, type: 'text' },
-                { text: 'Gát lại những nỗi buồn của tuổi 17 và bắt đầu mới của tuổi 18.', fontSize: '3rem', duration: 4000, type: 'text' },
-                { text: 'Và chuẩn bị hành trang thật tốt để bước vào quãng thời gian cao học đầy cam go nhưng cũng nhiều điều đáng mong chờ nhé.', fontSize: '3rem', duration: 4000, type: 'text' }
+                { text: '🎉 Happy Birthday 🎉', fontSize: '4rem', duration: 3800, type: 'text' },
             ];
+
+            const textSlides = [
+                { text: 'Huỳnh Thị Thùy Lâm (& Black)', fontSize: '4.5rem', duration: 4200, type: 'text' },
+                { text: '📅 16/07/2026', fontSize: '3.2rem', duration: 4200, type: 'text' },
+                { text: '🎂 18 tuổi rực rỡ', fontSize: '3.2rem', duration: 4200, type: 'text' },
+                { text: 'Chúc mừng sinh nhật Mee nha!', fontSize: '3.2rem', duration: 4200, type: 'text' },
+                { text: 'Tuổi mới thật Hạnh phúc, may mắn và thành công hơn!', fontSize: '3rem', duration: 4200, type: 'text' },
+                { text: 'Gác lại nỗi buồn của tuổi 17, mở ra một chương thật mới.', fontSize: '3rem', duration: 4200, type: 'text' },
+                { text: 'Chuẩn bị hành trang vững vàng cho quãng thời gian đầy thử thách nhưng cũng thật đáng mong chờ.', fontSize: '3rem', duration: 4200, type: 'text' },
+                { text: 'Cầu chúc Mee luôn tràn đầy năng lượng và luôn là phiên bản tuyệt nhất.', fontSize: '3rem', duration: 4200, type: 'text' }
+            ];
+
             const imageSequence = [
                 'src/14.jpg',
                 'src/2.jpg',
@@ -364,10 +388,10 @@
                 'src/8.jpg',
                 'src/10.jpg',
                 'src/11.jpg',
-                'src/12.jpg',   
+                'src/12.jpg',
                 'src/13.jpg',
                 'src/1.jpg',
-                'src/15.jpg',            
+                'src/15.jpg',
                 'src/16.jpg',
                 'src/17.jpg',
                 'src/18.jpg',
@@ -377,7 +401,6 @@
                 'src/22.jpg',
                 'src/23.jpg',
                 'src/24.jpg',
-//                'src/25.jpg',
                 'src/26.jpg',
                 'src/27.jpg',
                 'src/28.jpg',
@@ -385,15 +408,22 @@
                 'src/30.jpg',
                 'src/31.jpg'
             ].map((src) => ({
-                src: src.startsWith('./') || src.startsWith('/') ? src : `./${src.replace(/^\/+/, '')}`,
-                duration: 4000,
+                src: `./${src.replace(/^\/+/, '')}`,
+                duration: 3600,
                 type: 'image'
             }));
 
+            const mainSequence = [];
+            const maxSlides = Math.max(textSlides.length, imageSequence.length);
+            for (let i = 0; i < maxSlides; i++) {
+                if (textSlides[i]) mainSequence.push(textSlides[i]);
+                if (imageSequence[i]) mainSequence.push(imageSequence[i]);
+            }
+
             let introIndex = 0;
-            let imageIndex = 0;
+            let mainIndex = 0;
             let currentPhase = 'intro';
-            let initialStarDisplayDelay = 3000;
+            let initialStarDisplayDelay = 2800;
             let slideshowTimer = null;
 
             function clearActiveLayers() {
@@ -429,12 +459,12 @@
                     introIndex += 1;
 
                     if (introIndex >= introSequence.length) {
-                        currentPhase = 'image';
-                        imageIndex = 0;
+                        currentPhase = 'main';
+                        mainIndex = 0;
                     }
                 } else {
-                    currentItem = imageSequence[imageIndex];
-                    imageIndex = (imageIndex + 1) % imageSequence.length;
+                    currentItem = mainSequence[mainIndex];
+                    mainIndex = (mainIndex + 1) % mainSequence.length;
                 }
 
                 clearActiveLayers();

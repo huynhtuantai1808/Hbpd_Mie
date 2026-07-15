@@ -22,8 +22,9 @@ window.addEventListener('resize', resizeCanvas);
 
 const isMobile = window.innerWidth <= 768 || navigator.maxTouchPoints > 0;
 const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const starCount = isMobile ? 45 : 100;
-const streakRate = isMobile ? 2 : 6;
+const starCount = isMobile ? 45 : 120;
+const streakRate = isMobile ? 1 : 4;
+const palette = ['#ff7dd9', '#7ef0ff', '#ffe37a', '#ff8dd6', '#8de0ff'];
 
 // ⭐ Twinkling stars
 let stars = [];
@@ -31,9 +32,10 @@ for (let i = 0; i < starCount; i++) {
   stars.push({
     x: Math.random() * width,
     y: Math.random() * height,
-    r: Math.random() * 1.5 + 0.5,
+    r: Math.random() * 1.7 + 0.6,
     alpha: Math.random(),
-    delta: Math.random() * 0.02 + 0.005,
+    delta: Math.random() * 0.018 + 0.006,
+    color: palette[Math.floor(Math.random() * palette.length)]
   });
 }
 
@@ -43,10 +45,10 @@ class Streak {
     this.x = Math.random() * width;
     this.y = -60;
     this.length = Math.random() * 80 + 120;
-    this.speed = Math.random() * 3 + 4;
+    this.speed = Math.random() * 2.6 + 4.2;
     this.alpha = 1;
-    this.fade = 0.006;
-    this.color = '#cc66ff';
+    this.fade = 0.007;
+    this.color = palette[Math.floor(Math.random() * palette.length)];
   }
   update() {
     this.y += this.speed;
@@ -73,14 +75,14 @@ const streaks = [];
 class Particle {
   constructor(x, y, color) {
     const a = Math.random() * Math.PI * 2;
-    const s = (isMobile ? 1.8 : 4) + Math.random() * (isMobile ? 1.2 : 2);
+    const s = (isMobile ? 1.8 : 4) + Math.random() * (isMobile ? 1.1 : 2.5);
     this.x = x;
     this.y = y;
     this.vx = Math.cos(a) * s;
     this.vy = Math.sin(a) * s;
     this.alpha = 1;
-    this.size = Math.random() * (isMobile ? 1.4 : 2) + (isMobile ? 1.2 : 2);
-    this.color = color;
+    this.size = Math.random() * (isMobile ? 1.6 : 3) + (isMobile ? 1.4 : 2.6);
+    this.color = color || palette[Math.floor(Math.random() * palette.length)];
   }
   update() {
     this.vx *= 0.96;
@@ -173,12 +175,16 @@ function drawHeart(cx, cy, size, alpha) {
 
 function animate() {
   ctx.clearRect(0, 0, width, height);
-  ctx.fillStyle = 'black';
+  const bg = ctx.createLinearGradient(0, 0, width, height);
+  bg.addColorStop(0, '#19001d');
+  bg.addColorStop(0.45, 'rgba(53, 20, 100, 0.85)');
+  bg.addColorStop(1, '#21062a');
+  ctx.fillStyle = bg;
   ctx.fillRect(0, 0, width, height);
 
-  // 💡 Neon flicker overlay
-  if (Math.random() < 0.05) {
-    ctx.fillStyle = 'rgba(0,255,255,0.03)';
+  // 💡 Soft sparkle overlay
+  if (Math.random() < 0.045) {
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
@@ -186,10 +192,10 @@ function animate() {
     star.alpha += star.delta;
     if (star.alpha <= 0 || star.alpha >= 1) star.delta = -star.delta;
     ctx.beginPath();
-    ctx.globalAlpha = star.alpha;
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-    ctx.shadowColor = '#00ffff';
-    ctx.shadowBlur = 15;
+    ctx.globalAlpha = 0.6 + star.alpha * 0.4;
+    ctx.fillStyle = star.color;
+    ctx.shadowColor = star.color;
+    ctx.shadowBlur = 14;
     ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
     ctx.fill();
   });
@@ -216,10 +222,10 @@ function animate() {
   if (explodeCooldown > 0) explodeCooldown--;
 
   if (currentTextIndex >= textQueue.length && textParticles.length === 0) {
-    heartAlpha += 0.01;
-    heartPulse += 0.05;
-    const scale = 0.12 + Math.sin(heartPulse) * 0.005;
-    drawHeart(width / 2, height * 0.8, scale, heartAlpha);
+    heartAlpha = Math.min(1, heartAlpha + 0.012);
+    heartPulse += 0.06;
+    const scale = 0.14 + Math.sin(heartPulse) * 0.006;
+    drawHeart(width / 2, height * 0.82, scale, heartAlpha);
   }
 
   requestAnimationFrame(animate);
